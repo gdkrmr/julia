@@ -156,6 +156,8 @@ paths = Dict{UUID,String}(
 
 #### Package directories
 
+Package directories provide a kind of environment that approximates package loading in Julia 0.6 and earlier, and which resembles package loading in many other dynamic languages. 
+
 #### Stacked environemnts
 
 ### Finding `X`
