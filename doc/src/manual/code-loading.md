@@ -26,13 +26,11 @@ Since the decentralized naming problem is somewhat abstract, it may help to walk
 
 An *environment* determines what `import X` and `using X` mean in various parts of your code and what file they cause to be loaded. Julia understands three kinds of environments:
 
-1. **Project environments:** an environment implied by a Julia project with a standard source code layout, including a project file recording what dependencies the project has and optionally a manifest file recording precise versions and/or locations of depenenecies to use.
-2. **Package directories:** an environment implied by a directory containing a set of Julia packages. If `X/src/X.jl` is a file in a package directory, then `X` is considered to be a package and `X/src/X.jl` is the Julia source file that is loaded to acquire the `X` package.
-3. **Environment stacks:** given an ordered set of environments, a new "stacked" or "composite" environment can be created by overlaying the three maps each of the component environments, with the earlier environments take precedence over later ones when they have the same keys.
+1. **Package directories:** an environment implied by a directory containing a set of Julia packages. If `X/src/X.jl` is a file in a package directory, then `X` is considered to be a package and `X/src/X.jl` is the Julia source file that is loaded to acquire the `X` package.
+2. **Project environments:** an environment implied by a Julia project with a standard source code layout, including a project file recording what dependencies the project has and optionally a manifest file recording precise versions and/or locations of depenenecies to use.
+3. **Environment stacks:** a set of package directories or projects can be combined to make a new "stacked environment" which overlays all the packages that can be loaded from the environments it contains. Julia's load path, controlled by the `LOAD_PATH` global variable, is a stacked environment, containing a mix of project directories and package environments.
 
-Julia's load path, controlled by the `LOAD_PATH` global variable, is a stacked environment, containing a mix of project and package environments from various system and user locations. The default primary environment—i.e. the first environment in the load path—is a project environment, either of the current project based on the working directory, or a shared environment named `v0.7` (assuming you're running Julia version 0.7). 
-
-As an abstraction, an environment provides three maps: `roots`, `graph` and `paths`:
+As an abstraction, an environment provides three maps, which we'll call `roots`, `graph` and `paths`:
 
 - **The roots map:** `name::String` ⟶ `uuid::UUID`
 
