@@ -24,7 +24,15 @@ Since the decentralized naming problem is somewhat abstract, it may help to walk
 
 ### Environments
 
-An *environment* determines what `import X` and `using X` mean in various parts of your code and what file they cause to be loaded. As an abstraction, an environment provides three maps: `roots`, `graph` and `paths`. The following describes the meaning of these maps and how Julia uses them.
+An *environment* determines what `import X` and `using X` mean in various parts of your code and what file they cause to be loaded. Julia understands three kinds of environments:
+
+1. **Project environments:** an environment implied by a Julia project with a standard source code layout, including a project file recording what dependencies the project has and optionally a manifest file recording precise versions and/or locations of depenenecies to use.
+2. **Package directories:** an environment implied by a directory containing a set of Julia packages. If `X/src/X.jl` is a file in a package directory, then `X` is considered to be a package and `X/src/X.jl` is the Julia source file that is loaded to acquire the `X` package.
+3. **Environment stacks:** given an ordered set of environments, a new "stacked" or "composite" environment can be created by overlaying the three maps each of the component environments, with the earlier environments take precedence over later ones when they have the same keys.
+
+Julia's load path, controlled by the `LOAD_PATH` global variable, is a stacked environment, containing a mix of project and package environments from various system and user locations. The default primary environment—i.e. the first environment in the load path—is a project environment, either of the current project based on the working directory, or a shared environment named `v0.7` (assuming you're running Julia version 0.7). 
+
+As an abstraction, an environment provides three maps: `roots`, `graph` and `paths`:
 
 - **The roots map:** `name::String` ⟶ `uuid::UUID`
 
@@ -38,13 +46,7 @@ An *environment* determines what `import X` and `using X` mean in various parts 
 
    A map from UUIDs to paths from which to load packages. When encountering `import X` with UUID  `uuid` as determined by `roots` or `graph`, Julia looks up `paths[uuid]` and loads that path.
 
-The roots map and dependency graph are used to answer the "what" question in resolving the meaning of `import X` while the paths map answers the "where" question. Julia understands three kinds of environments:
-
-1. **Project environments:** an environment implied by a Julia project with a standard source code layout, including a project file recording what dependencies the project has and optionally a manifest file recording precise versions and/or locations of depenenecies to use.
-2. **Package directories:** an environment implied by a directory containing a set of Julia packages. If `X/src/X.jl` is a file in a package directory, then `X` is considered to be a package and `X/src/X.jl` is the Julia source file that is loaded to acquire the `X` package.
-3. **Stacked environments:** given an ordered set of environments, a new "stacked" or "composite" environment can be created by overlaying the three maps each of the component environments, with the earlier environments take precedence over later ones when they have the same keys.
-
-Julia's load path, controlled by the `LOAD_PATH` global variable is a stacked environment, which contains a mix of project and package environments from various system and user locations. The following sections explain in detail how the roots map, dependency graph, and paths map are derived from these three kinds of environments.
+The roots map and dependency graph are used to answer the "what" question in resolving the meaning of `import X` while the paths map answers the "where" question. The following sections explain in detail how the roots map, dependency graph, and paths map are determined for projects, package directories, and environment stacks.
 
 #### Project environments
 
@@ -164,7 +166,7 @@ paths = Dict{UUID,String}(
 
 Package directories provide a kind of environment that approximates package loading in Julia 0.6 and earlier, and which resembles package loading in many other dynamic languages. 
 
-#### Stacked environemnts
+#### Environemnt stacks
 
 ### Finding `X`
 
