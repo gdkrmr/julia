@@ -26,9 +26,9 @@ Since the decentralized naming problem is somewhat abstract, it may help to walk
 
 An *environment* determines what `import X` and `using X` mean in various parts of your code and what file they cause to be loaded. Julia understands three kinds of environments:
 
-1. **Project environments:** an environment determined by a Julia project with a standard source code layout, including a project file recording what dependencies the project has and optionally a manifest file recording precise versions and/or locations of depenenecies to use.
-2. **Package directories:** an environment determined by a directory containing a set of Julia packages. If `X/src/X.jl` is a file in a package directory, then `X` is considered to be a package and `X/src/X.jl` is the source file that is loaded to acquire the `X` package.
-3. **Stacked environments:** an environment determined by an ordered set of package directories or projects, combined to make a new "stacked environment". This environment overlays all the packages available in the environments it contains. Julia's load path, controlled by the `LOAD_PATH` global variable, is a stacked environment, overlaying the project directories and package environments it contains.
+1. **A project environment** is a directory with a project file and optionally a manifest file. The project file determines what the names and identities of the direct dependencies of the environemnt are, while the manifest file, if present, gives the complete dependency graph, exact versions of each dependency, and enough information to determine locations for each dependency.
+2. **A package directories** is an environment implicitly determined by the set of packages it contains. If `X` is a subdirectory and `X/src/X.jl` is a file, then `X` is taken to a be top-level dependency, and `X/src/X.jl` is the source file to load when `import X` is encounted and resolved to this `X`. If the `X` subdirectory has a project file in it then that project file determines the UUID of `X`.
+3. **A stacked environment** is an ordered collection of environments—project environments and package directories—overlaid to make a new "stacked environment". In this composite environment, all packages available in the environments it contains are available. Julia's load path, as controlled by the `LOAD_PATH` global variable, is such a stacked environment.
 
 As an abstraction, each environment provides three maps, which we'll call `roots`, `graph` and `paths`:
 
